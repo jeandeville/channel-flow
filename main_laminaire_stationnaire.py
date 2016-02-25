@@ -59,3 +59,4 @@ U = np.linalg.solve(nu*A, B);
 plt.plot(y,U)
 plt.plot(y,Uexact)
 plt.show();
+plt.ylim((0,300));

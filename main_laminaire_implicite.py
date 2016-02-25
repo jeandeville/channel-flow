@@ -18,17 +18,20 @@ from laplacien import *;
 #   Paramètres
 h = 1 # taille de la moitie du canal
 r = 1.01 # taux de croissance du maillage
-Nmax = 10; # taille du maillage
 Niter = 300; # nombre d'itérations
 dt = 10.; # pas de calcul
 dy0= 0.01;# pas de la première cellule 
-init =10.0; # valeur initiale 
 gradient=-1.0; # gradient de pression modifié (1/rho * dPe/dx)
 nu=1.75*10**-3; # viscosité dynamique à 0 C
 
 #création du maillage
 y = maillage(h,r,dy0);
-####affichage du maillage brut#####
+
+# Def Nb_Pts
+Nb_Pts = np.size(y);
+Nmax = Nb_Pts-1;
+
+#####affichage du maillage brut#####
 #for i in range(Nb_Pts): 
 #    plt.plot([0.0, 10.0], [y[i], y[i]], 'r-', lw=2) 
 #plt.show()
@@ -46,7 +49,7 @@ A = laplacien(y);
 
 # matrice identité modifiée (pour prendre en compte les conditions aux limites, cf rapport word)
 Id=np.eye(Nmax+1,Nmax+1);
-Id[Nmax,Nmax]=1;
+#Id[Nmax,Nmax]=1;
 Id[Nmax,Nmax-1]=-1;
 
 #matrice A tild du membre de gauche (rassemblement des deux matrices préc)
@@ -66,6 +69,7 @@ for t in range(Niter):
     plt.plot(y,U)
     plt.plot(y,Uexact)
     plt.show();
+    plt.ylim((0,300))
     plt.pause(0.0001)
     
     # precision = np.linalg.norm(U-Uprecedent);

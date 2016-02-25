@@ -2,12 +2,12 @@
 """
 Created on Mon Feb  1 16:15:44 2016
 
-@author: Said et Jean
+@author: Said
 """
 
 #########################################
 #   COUCHE LIMITE LAMINAIRE
-#   dU/dt = -1/rho*dP/dx +nu.d2U/dy2
+#   dU/dt = 1/rho*dP/dx +nu.d2U/dy2
 #########################################
 
 
@@ -19,9 +19,9 @@ from laplacien import *;
 
 #   Paramètres
 h = 1 # taille de la moitie du canal
-r = 1.01 # taux de croissance du maillage
-#Nmax = 10; # taille du maillage
-Niter = 100; # nombre d'itérations
+r = 1.0001 # taux de croissance du maillage
+Nmax = 10; # taille du maillage
+Niter = 10000; # nombre d'itérations
 dt = 0.01; # pas de calcul
 dy0= 0.01;# pas de la première cellule 
 init =10.0; # valeur initiale 
@@ -31,26 +31,30 @@ nu=1.75*10**-3; # viscosité dynamique à 0 C
 #maillage
 y = maillage(h,r,dy0);
 
-#def de Nb_pts
-Nb_Pts = np.size(y);
-Nmax = Nb_Pts -1;
-
-####affichage du maillage brut#####
-#for i in range(Nb_Pts):
-#    plt.plot([0.0, 10.0], [y[i], y[i]], 'r-', lw=2) 
-#plt.show()
-
 #autres paramètres
 Nb_Pts = np.size(y);
 Nmax = Nb_Pts - 1;
 
+##affichage du maillage brut
+#for i in range(Nb_Pts):
+#    plt.plot([0.0, 10.0], [y[i], y[i]], 'r-', lw=2) 
+#plt.show()
+
 #solution exacte
 Uexact = 1/(2*nu)*gradient*np.multiply(y,np.add(y,-2*h));
+#plt.plot(y,Uexact)
+#plt.show();
 
 # Initialisation
 U0 = np.zeros(([Nmax+1,1]));
 for t in range(Nmax+1):
-    U0[t,0]=Uexact[t]*0.5*0.; #initialisation à 0 (ou à 0.5 * solution initiale)
+    U0[t,0]=Uexact[t]*0.5*0.;
+
+#U0 = 1./2.* Uexact;
+#plt.plot(y,U0)
+#plt.show();
+
+
 
 # matrice laplacien modifiée pour prendre en compte la condition aux limites de symetrie
 A = laplacien(y);
@@ -66,6 +70,8 @@ Id[Nmax,Nmax-1]=1;
 B= dt*gradient*np.ones((Nmax+1,1)); 
 B[0,0] = 0;
 
+
+#fig = plt.figure()
 U=U0;
 for t in range(Niter):
     Uprecedent=U;
@@ -75,3 +81,9 @@ for t in range(Niter):
     #plt.plot(y,Uexact)
     plt.show();
     plt.pause(0.0001)
+    
+    # precision = np.linalg.norm(U-Uprecedent);
+    
+    
+    
+    
