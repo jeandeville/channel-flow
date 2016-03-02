@@ -30,6 +30,14 @@ u_tau=np.sqrt(h*(-gradient));# vitesse caractéristique de frottement (u_tau=mu.
 nu=u_tau*h/Rstar; # viscosité dynamique à 0 C
 Niter = 300; # nombre d'itérations
 dt = 10.; # pas de calcul
+
+#Paramètres de k-omega
+sigma_k = 0.5;
+sigma_omega = 0.5;
+gamma = 5./9.;
+beta = 3./40.;
+beta_star = 0.09;
+
 ####################
 ####### IL FAUT RAJOUTER LES CONSTANTES SIGMA_K SIGMA_OMEGA ET GAMMA
 #######################
@@ -55,7 +63,7 @@ Ulaminaire = 1/(2*nu)*gradient*np.multiply(y,np.add(y,-2*h));
 Init=initialisation(y,h,Rstar,gradient);
 U0=Init[0,:];
 nu_t0=Init[1,:];
-k0=Init[2,:];
+K0=Init[2,:];
 omega0=Init[3,:];
 
 #plt.plot(y,u0)
@@ -65,29 +73,34 @@ omega0=Init[3,:];
 #print(omega0)
 
 Uprec = U0;
-kprec = k0;
+Kprec = K0;
 omegaprec = omega0;
 nu_tprec = nu_t0;
 Id = np.eye(Nb_Pts);
 
+#plt.plot(y,Ulaminaire);
+#plt.plot(y,U0);
+#plt.show;
+
+
+
+
 ################## DEBUT BOUCLE ##############
-
-
 ######### 
 #Mise à jour du vecteur U_n+1:
 #U_n+1 = -dt* Gr + (Id +dt * L(nu_t)).U_n
 ########
-U = -dt * Gr + np.multiply((Id + dt * L_turbulent(nu,nu_t,1,y)),Uprec); #on envoie 1 car formule de L_Turbulent: nu + sigma*nu_t
+U = -dt * Gr + np.dot((Id + dt * L_turbulent(nu,nu_tprec,1,y)),Uprec); #on envoie 1 car formule de L_Turbulent: nu + sigma*nu_t
 
 
 
 ##########
 #Mise à jour vecteur K
-# K_n+1 = (Id + dt * M(Beta_etoile,omega))^-1 * (dt*N(U_n,nu_t_n) + (Id + dt * L(nu, nu_t_n,sigma_k)).K_n )
+# K_n+1 = (Id + dt * M(beta_star,omega))^-1 * (dt*N(U_n,nu_t_n) + (Id + dt * L(nu, nu_t_n,sigma_k)).K_n )
 ##########
 inverse_matrix = inverse_tdgauche_turbulent (dt, beta_star, omegaprec);
-second_terme = dt *  N_turbulent(Uprec,nu_tprec,y) + np.multiply(Id + dt * L_turbulent(nu,nu_tprec,sigma_k,y),kprec);
-K = np.multiply(inverse_matrix,second_terme);
+second_terme = dt *  N_turbulent(Uprec,nu_tprec,y) + np.dot(Id + dt * L_turbulent(nu,nu_tprec,sigma_k,y),Kprec);
+K = np.dot(inverse_matrix,second_terme);
 
 
 
@@ -96,9 +109,22 @@ K = np.multiply(inverse_matrix,second_terme);
 # W_n+1 = (Id + dt * M(Beta,omega))^-1 * (dt*N(U_n,gamma) + (Id + dt * L(nu, nu_t_n,sigma_omega)).W )
 ##########
 inverse_matrix = inverse_tdgauche_turbulent (dt, beta, omegaprec);
-second_terme = dt *  N_turbulent(Uprec,gamma,y) + np.multiply(Id + dt * L_turbulent(nu,nu_tprec,sigma_omega,y),omegaprec);
-omega = np.multiply(inverse_matrix,second_terme);
+second_terme = dt *  N_turbulent(Uprec,gamma,y) + np.dot(Id + dt * L_turbulent(nu,nu_tprec,sigma_omega,y),omegaprec); #dot: produit mat. multiply: terme à terme
+omega = np.dot(inverse_matrix,second_terme);
 
+
+###########
+#Traitement des conditions aux limites
+# omega_paroi = 10 6*nu / (beta * (dy0)^2 )       omega(Nb_Pts) = omega(Nb_Pts - 1)
+#k_paroi = 0        k(Nb_Pts) = k(Nb_Pts-1)
+#U_paroi = 0        U(Nb_Pts) = U(Nb_Pts-1)
+###########
+omega[0] = 10 * 6 * nu / (beta * (dy0)**2 );
+omega[Nb_Pts-1] = omega[Nb_Pts-2];
+K[0] = 0;
+K[Nb_Pts-1] = K[Nb_Pts-2];
+U[0] = 0;
+U[Nb_Pts-1] = U[Nb_Pts-2];
 
 ##########
 #Mise à jour nu_t
@@ -107,9 +133,21 @@ omega = np.multiply(inverse_matrix,second_terme);
 nu_t = np.multiply(K,np.power(omega,-1));
 
 
+plt.clf()
+plt.plot(y,U)
+#plt.plot(y,U0)
+#plt.plot(y,Ulaminaire)
+plt.show();
+#plt.ylim((0,300))
+#plt.pause(0.0001)
+
+###### Stockage du vecteurs actuels dans les vecteurs précs
+Uprec = U;
+Kprec = K;
+omegaprec = omega;
+nu_tprec = nu_t;
+
 ################## FIN BOUCLE ##############
 
-
-
-
-
+plt.plot(y,nu_tprec)
+plt.show()

@@ -45,9 +45,9 @@ def laplacien (y):
     for i in range (1,Nb_Pts-1): #i va de 1 à Nb_Pts - 2
         dy_moyen = 0.5 * (dy[i-1] + dy[i]);
         
-        A[i,i] = -2/(dy[i-1]*dy[i]);
-        A[i,i-1] = 1/(dy_moyen*dy[i-1]);
-        A[i,i+1] = 1/(dy_moyen*dy[i]);
+        A[i,i] = -2.0/(dy[i-1]*dy[i]);
+        A[i,i-1] = 1.0/(dy_moyen*dy[i-1]);
+        A[i,i+1] = 1.0/(dy_moyen*dy[i]);
         
     return A;
     
@@ -83,7 +83,7 @@ def inverse_tdgauche_turbulent (dt, beta, omega): #correspond à l'inverse du te
     mat_inverse = np.zeros([Nb_Pts,Nb_Pts]);
     
     for i in range(Nb_Pts):
-        mat_inverse[i,i] = 1/(1+dt*beta*omega[i]); 
+        mat_inverse[i,i] = 1.0/(1.0+dt*beta*omega[i]); 
         
     return mat_inverse;
     
@@ -107,7 +107,7 @@ def N_turbulent(U,nu_t,y): #correspond au terme de droite "N" du rapport, corres
     N = np.zeros(Nb_Pts);
     
     for i in range(1,Nb_Pts-1): # le premier et le dernier terme reste à 0 !!!!!!
-        N[i] = nu[i] * (0,5 *((U[i+1]-U[i])/dy[i]+(U[i]-U[i-1])/dy[i-1])**2);
+        N[i] = nu[i] * (0.5 *((U[i+1]-U[i])/dy[i]+(U[i]-U[i-1])/dy[i-1])**2);
         
     return N;
     
@@ -123,14 +123,14 @@ def L_turbulent(nu,nu_t,sigma,y): #correspond au terme de droite "L" du rapport,
         dy[i] = y[i+1] - y[i];
         
         
-    L = np.zeros(Nb_Pts);
+    L = np.zeros([Nb_Pts,Nb_Pts]);
     
     for i in range(1,Nb_Pts-1):
-        dymoyen = 0,5 * (dy[i]+dy[i-1]);  
-        nu_t_plus = 0,5 * (nu_t[i+1] + nu_t[i]);
-        nu_t_moins = 0,5 * (nu_t[i] + nu_t[i-1]);
+        dymoyen = 0.5 * (dy[i]+dy[i-1]);  
+        nu_t_plus = 0.5 * (nu_t[i+1] + nu_t[i]);
+        nu_t_moins = 0.5 * (nu_t[i] + nu_t[i-1]);
         
-        L[i,i] = -1/dymoyen * ((nu + sigma * nu_t_plus)/dy[i] + (nu + sigma*nu_t_moins)/dy[i-1]);
+        L[i,i] = -1.0/dymoyen * ((nu + sigma * nu_t_plus)/dy[i] + (nu + sigma*nu_t_moins)/dy[i-1]);
         L[i,i-1] = (nu+sigma*nu_t_moins)/(dymoyen*dy[i-1]);
         L[i,i+1] = (nu+sigma*nu_t_plus)/(dymoyen*dy[i]);
         
