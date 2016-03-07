@@ -77,15 +77,20 @@ def laplacien (y):
 #    return A;
     
     
-def inverse_tdgauche_turbulent (dt, beta, omega): #correspond à l'inverse du terme de gauche (1+dt*Beta*omega(i)); c'est une matrice diagonale
+def M_turbulent (beta, omega): #correspond à  la matrice diag (M(i,i)=Beta*omega(i)); 
 
     Nb_Pts = np.size(omega);
-    mat_inverse = np.zeros([Nb_Pts,Nb_Pts]);
+    mat = np.zeros([Nb_Pts,Nb_Pts]);
     
     for i in range(Nb_Pts):
-        mat_inverse[i,i] = 1.0/(1.0+dt*beta*omega[i]); 
-        
-    return mat_inverse;
+        mat[i,i] = beta*omega[i]; 
+    
+    
+    # conditions aux limites
+    mat[0,0]=0.0;
+    mat[Nb_Pts-1,Nb_Pts-1]=0.0;
+    
+    return mat;
     
 
 def N_turbulent(U,nu_t,y): #correspond au terme de droite "N" du rapport, correspond au terme en carré de la dérivée de la vitesse
@@ -125,7 +130,7 @@ def L_turbulent(nu,nu_t,sigma,y): #correspond au terme de droite "L" du rapport,
         
     L = np.zeros([Nb_Pts,Nb_Pts]);
     
-    for i in range(1,Nb_Pts-1):
+    for i in range(1,Nb_Pts-1): # de 1 à Nb-2 pour prenrdre en compte les bc
         dymoyen = 0.5 * (dy[i]+dy[i-1]);  
         nu_t_plus = 0.5 * (nu_t[i+1] + nu_t[i]);
         nu_t_moins = 0.5 * (nu_t[i] + nu_t[i-1]);
