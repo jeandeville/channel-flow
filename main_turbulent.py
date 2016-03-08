@@ -21,25 +21,40 @@ from Initialisation import *
 
 #   Paramètres
 r = 1.01 # taux de croissance du maillage
+Niter = 350; # nombre d'itérations
+dt = 100.; # pas de calcul
 
+#Entrées versions 1
 #h = 1 # taille de la moitie du canal
 #gradient=-1.0# gradient de pression modifié (1/rho * dPe/dx)
 #Rstar=950.0; # nombre de rynolds (Rstar=u_tau*h/nu)
 #u_tau=np.sqrt(h*(-gradient));# vitesse caractéristique de frottement (u_tau=mu.dU/dy|y=0) 
 #nu=u_tau*h/Rstar; # viscosité dynamique à 0 C
-#Niter = 300; # nombre d'itérations
-#dt = 10.; # pas de calcul
 
+
+#Entrées version 2
 Rstar=950.0; # nombre de rynolds (Rstar=u_tau*h/nu)
 u_tau = 0.045390026;
 nu = 1/(20580.0);
+#Rstar=180.0; # nombre de rynolds (Rstar=u_tau*h/nu)
+#u_tau = 0.057231059;
+#nu = 1/(3250.0);
 
 h = Rstar*nu / u_tau;
 gradient = - u_tau**2/h;
 
 
-Niter = 300; # nombre d'itérations
-dt = 100.; # pas de calcul
+
+#chargement de uplus et y plus DNS NASA
+#lines = np.loadtxt("Re180.txt")
+#yplusDNS = lines[0:48,1]
+#uplusDNS = lines[0:48,2]
+lines = np.loadtxt("Re950.txt")
+yplusDNS = lines[0:192,1]
+uplusDNS = lines[0:192,2]
+
+
+
 
 #Paramètres de k-omega
 sigma_k = 0.5;
@@ -51,7 +66,8 @@ beta_star = 0.09;
 
 
 #création du maillage
-dy0plus = 0.031230073;
+dy0plus = 0.031230073; # pour RE 950
+#dy0plus = 0.099759176 # Pour Re 180
 dy0=dy0plus*h/Rstar;# pas de la première cellule 
 y = maillage(h,r,dy0);
 
@@ -96,14 +112,11 @@ Id_tid = np.eye(Nb_Pts); #correspond à une matrice identité prenant en compte 
 Id_tid[Nmax,Nmax-1] =-1;
 
 
-#chargement de uplus et y plus DNS NASA
-lines = np.loadtxt("Re950.txt")
-yplusDNS = lines[0:192,1]
-uplusDNS = lines[0:192,2]
 
 
 
-for i in range(300):
+
+for i in range(Niter):
     ################## DEBUT BOUCLE ##############
 
     ######### 
@@ -159,9 +172,12 @@ for i in range(300):
     plt.plot(yplus,u0plus,'b',label='mixing length');
     plt.plot(yplus[1:160],Uwall_sublayer[1:160],'y',label='wall law');
     plt.plot(yplus[120:Nmax],Uwall_loglayer[120:Nmax],'y');
-    plt.ylim((0,25))
     plt.xscale('log')
-    plt.title('U+=f(y+) pour DNS, RANS(k-w), Lmelange')
+    plt.ylim((0,25))
+    plt.xlim((0,190))
+    plt.title('U+=f(y+):    Re_tau = 950, 1/nu = 20580; u_tau = 0.045390026')
+    #    plt.title('U+=f(y+):    Re_tau = 180, 1/nu = 3250; u_tau = 0.057231059')
+    
     #plt.legend(bbox_to_anchor=(1.05,1), loc=-1, borderaxespad=0.)
     plt.legend(loc=2);
     plt.show()
