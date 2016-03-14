@@ -90,7 +90,8 @@ def N_turbulent(U,nu_t,y): #correspond au terme de droite "N" du rapport, corres
     N = np.zeros(Nb_Pts);
     
     for i in range(1,Nb_Pts-1):  # de 1 à Nb-2 pour prenrdre en compte les bc
-        N[i] = nu[i] * (0.5 *((U[i+1]-U[i])/dy[i]+(U[i]-U[i-1])/dy[i-1])**2);
+        #N[i] = nu[i] * (0.5 *((U[i+1]-U[i])/dy[i]+(U[i]-U[i-1])/dy[i-1])**2);
+        N[i] = nu[i] * (((U[i+1]-U[i-1])/(dy[i]+dy[i-1]))**2);
         
     return N;
     
