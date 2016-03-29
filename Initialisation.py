@@ -13,8 +13,7 @@ Created on Thu Feb 25 16:29:13 2016
 
 import numpy as np
 import matplotlib.pyplot as plt
-from maillage import *
-from laplacien import *
+from modules import *
 
 
 def initialisation (y,h,Rstar,gradient):
