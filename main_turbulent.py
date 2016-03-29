@@ -21,7 +21,7 @@ from Initialisation import *
 
 #   Paramètres
 r = 1.01 # taux de croissance du maillage
-Niter = 350; # nombre d'itérations
+Niter = 300; # nombre d'itérations
 dt = 100.; # pas de calcul
 
 #Entrées versions 1
@@ -33,7 +33,7 @@ dt = 100.; # pas de calcul
 
 
 #Entrées version 2
-Rstar=950.0; # nombre de rynolds (Rstar=u_tau*h/nu)
+Rstar=934.0; # nombre de rynolds (Rstar=u_tau*h/nu)
 u_tau = 0.045390026;
 nu = 1/(20580.0);
 #Rstar=180.0; # nombre de rynolds (Rstar=u_tau*h/nu)
@@ -110,7 +110,7 @@ nu_tprec = nu_t0;
 
 Id_tid = np.eye(Nb_Pts); #correspond à une matrice identité prenant en compte lesCAL c'est à dire dernièreligne à 0...0 -1 1 ("I_tild")
 Id_tid[Nmax,Nmax-1] =-1;
-
+Id = np.eye(Nb_Pts);
 
 
 
@@ -123,12 +123,12 @@ for i in range(Niter):
     #Mise à jour du vecteur U_n+1:
     # U^(n+1)=[Id-∆t.L(v_t)]^(-1) (U^n-∆t*Gr)
     ########
-    A_u=Id_tid-dt*L_turbulent(nu,nu_tprec,1,y);
+    A_u=Id_tid-dt*L_turbulent(nu,nu_tprec,1.0,y);
     b_u=Uprec-dt * Gr;
     b_u[0]=0.0;
     b_u[Nmax]=0.0;
-    U = np.dot(np.linalg.inv(A_u), b_u) #on envoie 1 car formule de L_Turbulent: nu + sigma*nu_t
-    
+    #U = np.dot(np.linalg.inv(A_u), b_u) #on envoie 1 car formule de L_Turbulent: nu + sigma*nu_t
+    U=np.linalg.solve(A_u, b_u);
     ##########
     #Mise à jour vecteur K
     # 〖K^(n+1)〗=[I_d+∆t.M(β^*,ω^n )-∆t.L(υ,υ_t^n,σ_k)]^(-1) (〖∆t*N(u^n,υ_t^n)〗^ +K^n )
@@ -137,8 +137,8 @@ for i in range(Niter):
     b_k=dt *  N_turbulent(Uprec,nu_tprec,y)+ Kprec;
     b_k[0]=0.0;
     b_k[Nmax]=0.0;
-    K = np.dot(np.linalg.inv(A_k), b_k)   
-    
+    #K = np.dot(np.linalg.inv(A_k), b_k)   
+    K=np.linalg.solve(A_k, b_k)
     ##########
     #Mise à jour vecteur W
     # W_n+1=[Id+∆t.M(β,ω_n)-∆t.L(nu,nu_tprec,sigma_omega)]^(-1) (∆t.N(u_n,γ) +W_n )
@@ -147,8 +147,8 @@ for i in range(Niter):
     b_w=dt *  N_turbulent(Uprec,gamma,y)+ omegaprec;
     b_w[0] = 60.0 * nu / (beta * (dy0)**2 );# condition à la paroi de omega
     b_w[Nmax]=0.0;
-    W = np.dot(np.linalg.inv(A_w), b_w)    
-    
+    #W = np.dot(np.linalg.inv(A_w), b_w)    
+    W=np.linalg.solve(A_w, b_w)
     ##########
     #Mise à jour nu_t
     # nu_t = k / omega
@@ -173,17 +173,25 @@ for i in range(Niter):
     plt.plot(yplus[1:160],Uwall_sublayer[1:160],'y',label='wall law');
     plt.plot(yplus[120:Nmax],Uwall_loglayer[120:Nmax],'y');
     plt.xscale('log')
-    plt.ylim((0,25))
+    plt.ylim((0,20))
     plt.xlim((0,190))
-    plt.title('U+=f(y+):    Re_tau = 950, 1/nu = 20580; u_tau = 0.045390026')
-    #    plt.title('U+=f(y+):    Re_tau = 180, 1/nu = 3250; u_tau = 0.057231059')
-    
-    #plt.legend(bbox_to_anchor=(1.05,1), loc=-1, borderaxespad=0.)
+    plt.title('U+=f(y+):    Re_tau = 934, 1/nu = 20580; u_tau = 0.045390026')
+    #plt.title('U+=f(y+):    Re_tau = 180, 1/nu = 3250; u_tau = 0.057231059')
     plt.legend(loc=2);
+
+    #afichage de k
+#    plt.plot(yplus,K,'r',label='k'); 
+#    plt.xscale('log')
+#    #plt.ylim((0,0.002))
+#    plt.xlim((0,190))
+#    plt.title('k=f(y+)')
+    
+    #affichage de w
+    #plt.plot(yplus,W,'r',label='k'); 
+    
+    
     plt.show()
     plt.pause(0.0001)
-    
-    
     
     ###### Stockage du vecteurs actuels dans les vecteurs préc
     Uprec = U;

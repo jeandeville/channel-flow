@@ -22,7 +22,7 @@ from laplacien import *
 def initialisation (y,h,Rstar,gradient):
       
       
-    A=25.0; 
+    A=26.0; 
     ########Paramètres#############
     #h: taille de la moitie du canal
     #gradient: gradient de pression modifié (1/rho * dPe/dx)
@@ -50,8 +50,11 @@ def initialisation (y,h,Rstar,gradient):
     nu_t = np.multiply(np.power(l_melange,2),dUdY);
     nu_t[0] = 0;
     
+    
+    
     k=1.0/0.3*np.multiply(nu_t,dUdY);
     k[0] = 0;
+    #k[-1]=0  # à tester
     
     omega= np.multiply(k,np.power(nu_t,-1));
     omega[0] = omega[1];
@@ -66,6 +69,8 @@ def initialisation (y,h,Rstar,gradient):
         u[i+1]=dy[i]*dUdY[i]+u[i];
     u[Nmax]=u[Nmax-1];
     
+    
+    #nu_t[-1]=0 # à tester
     init=np.zeros([4,np.size(y)]);
     init[0,:]=u;
     init[1,:]=nu_t;
