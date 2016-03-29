@@ -56,7 +56,7 @@ if cas =='Re=950':
     uprim_vprim_plus=lines[0:193,10]
     
 # Calcul de k+ et nu_t+ de la DNS
-kplusDNS=0.5*np.sqrt(np.power(uprim_plus,2)+np.power(vprim_plus,2)+np.power(wprim_plus,2))
+kplusDNS=0.5*(np.power(uprim_plus,2)+np.power(vprim_plus,2)+np.power(wprim_plus,2))
 nu_t_plusDNS=np.multiply(np.abs(uprim_vprim_plus),np.power(dudy_plus(uplusDNS,yplusDNS),-1));
 
 
