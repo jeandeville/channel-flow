@@ -14,6 +14,8 @@ cas: two choices are possible: "Re=950" or "Re=180", corresponding to the two Re
 Graphs produced by our code are compared to two codes available online: a DNS code produced by the Universidad Politecnica de Madrid (for Reynolds 950)
 and an SST code produced by Bertrand Aupoix from ONERA France (for Re=180).
 
+A memoir on our project is available (in French) for further details in the development our code.
+
 Enjoy.
 Jean Deville, Said Ouhamou
 ISAE Supaero, Toulouse, France, 29 March 2016
