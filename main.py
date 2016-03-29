@@ -1,22 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-Created on Wed Mar 23 15:39:41 2016
-
-@author: Said
-"""
-
-# -*- coding: utf-8 -*-
-"""
-Created on Mon Mar 14 20:32:14 2016
-
-@author: Said
-"""
-
-# -*- coding: utf-8 -*-
-"""
 Created on Tue Feb 23 17:16:31 2016
 
-@author: jeandeville
+@author: Said Ouhamou et Jean Deville,ISAE Supaéro 2016
 """
 
 #########################################
@@ -81,10 +67,6 @@ if cas =='Re=950':
     uplusSST = linesSST[0:185,1];
     kplusSST = linesSST[0:185,2];
     nu_tplusSST = linesSST[0:185,4];
-
-
-
-
 
 
 

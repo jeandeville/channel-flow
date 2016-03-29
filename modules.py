@@ -2,7 +2,7 @@
 """
 Created on Sun Jan 31 18:55:28 2016
 
-@author: Said et Jean
+@author: Said Ouhamou et Jean Deville,ISAE Supaéro 2016
 """
 
 import math
